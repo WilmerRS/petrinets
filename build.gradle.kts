@@ -8,10 +8,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
 }
 
-group = "com.petrinets.engine"
+group = "com.petrinets.app"
 version = "0.0.1"
 application {
-    mainClass.set("com.petrinets.engine.ApplicationKt")
+    mainClass.set("com.petrinets.app.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")

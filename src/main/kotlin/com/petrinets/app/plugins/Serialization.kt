@@ -1,4 +1,4 @@
-package com.petrinets.engine.plugins
+package com.petrinets.app.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*

@@ -1,1 +1,1 @@
-rootProject.name = "com.petrinets.engine"
+rootProject.name = "com.petrinets.app"

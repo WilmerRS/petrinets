@@ -1,4 +1,4 @@
-package com.petrinets.engine.plugins
+package com.petrinets.app.plugins
 
 import io.ktor.server.routing.*
 import io.ktor.server.response.*

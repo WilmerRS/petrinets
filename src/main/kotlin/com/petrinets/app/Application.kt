@@ -1,11 +1,11 @@
-package com.petrinets.engine
+package com.petrinets.app
 
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-import com.petrinets.engine.plugins.configureRouting
-import com.petrinets.engine.plugins.configureSerialization
+import com.petrinets.app.plugins.configureRouting
+import com.petrinets.app.plugins.configureSerialization
 
 fun main() {
     embeddedServer(
