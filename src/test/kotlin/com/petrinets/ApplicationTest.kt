@@ -5,7 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.server.testing.*
 import kotlin.test.*
 import io.ktor.http.*
-import com.petrinets.app.plugins.configureRouting
+import com.petrinets.app.config.configureRouting
 
 class ApplicationTest {
     @Test
