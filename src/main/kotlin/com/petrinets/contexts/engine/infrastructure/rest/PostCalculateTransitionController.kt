@@ -1,89 +1,82 @@
 package com.petrinets.contexts.engine.infrastructure.rest
 
-import com.petrinets.contexts.engine.domain.PetriNet
-import com.petrinets.contexts.engine.domain.buildReachabilityTree
+import buildReachabilityTree
+import com.petrinets.contexts.engine.domain.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import org.jetbrains.kotlinx.multik.ndarray.operations.toList
 
-@Serializable
-data class Place(val name: String, val tokens: Int)
+import parseReachabilityTreeToJSON
 
-@Serializable
-data class Transition(val name: String)
-
-@Serializable
-data class Input(val place: String, val transition: String, val value: Int)
-
-@Serializable
-data class Output(val transition: String, val place: String, val value: Int)
-
-@Serializable
-data class PetriNetSerializer(
-    val inputs: Array<Input>,
-    val outputs: Array<Output>,
-    val transitions: Array<Transition>,
-    val places: Array<Place>,
-)
-
-@Serializable
-data class FirePetriNetSerializer(
-    val petriNet: PetriNetSerializer,
-    val transitionsToFire: Array<Transition>
-)
 
 fun Route.postCalculateTransitionController() {
     route("/transitions/fire") {
         post {
-            val firePetriNetSerializer = call.receive<FirePetriNetSerializer>()
+            try {
+                val firePetriNetSerializer = call.receive<FirePetriNetSerializer>()
 
-            val petriNet = PetriNet(
-                firePetriNetSerializer.petriNet.inputs,
-                firePetriNetSerializer.petriNet.outputs,
-                firePetriNetSerializer.petriNet.transitions,
-                firePetriNetSerializer.petriNet.places,
-            )
+                val petriNet = PetriNet(
+                    firePetriNetSerializer.petriNet.inputs.map { i -> Input(i.place, i.transition, i.value) },
+                    firePetriNetSerializer.petriNet.outputs.map { o -> Output(o.place, o.transition, o.value) },
+                    firePetriNetSerializer.petriNet.transitions.map { t -> Transition(t.name) },
+                    firePetriNetSerializer.petriNet.places.map { p -> Place(p.name, p.tokens) },
+                )
 
-            val newMarkings = petriNet.fireTransitions(firePetriNetSerializer.transitionsToFire)
+                val newMarkings = petriNet.fireTransitions(
+                    firePetriNetSerializer.transitionsToFire.map { t -> Transition(t.name) }
+                )
 
-            call.respond(mapOf("markings" to newMarkings.toList()))
+                call.respond(mapOf("markings" to newMarkings.toList()))
+            } catch (e: Throwable) {
+                call.respond(mapOf("errors" to e.message))
+            }
         }
     }
 
     route("/transitions/check-enables") {
         post {
-            val firePetriNetSerializer = call.receive<FirePetriNetSerializer>()
+            try {
+                val firePetriNetSerializer = call.receive<FirePetriNetSerializer>()
 
-            val petriNet = PetriNet(
-                firePetriNetSerializer.petriNet.inputs,
-                firePetriNetSerializer.petriNet.outputs,
-                firePetriNetSerializer.petriNet.transitions,
-                firePetriNetSerializer.petriNet.places,
-            )
+                val petriNet = PetriNet(
+                    firePetriNetSerializer.petriNet.inputs.map { i -> Input(i.place, i.transition, i.value) },
+                    firePetriNetSerializer.petriNet.outputs.map { o -> Output(o.place, o.transition, o.value) },
+                    firePetriNetSerializer.petriNet.transitions.map { t -> Transition(t.name) },
+                    firePetriNetSerializer.petriNet.places.map { p -> Place(p.name, p.tokens) },
+                )
 
-            val isEnabled = petriNet.transitionsIsEnable(firePetriNetSerializer.transitionsToFire)
+                val isEnabled = petriNet.transitionsIsEnable(
+                    firePetriNetSerializer.transitionsToFire.map { t -> Transition(t.name) }
+                )
 
-            call.respond(mapOf("isEnabled" to isEnabled))
+                call.respond(mapOf("isEnabled" to isEnabled))
+            } catch (e: Throwable) {
+                call.respond(mapOf("errors" to e.message))
+            }
         }
     }
 
     route("/reachability-tree") {
         post {
-            val firePetriNetSerializer = call.receive<PetriNetSerializer>()
+            try {
+                val petriNetSerializer = call.receive<PetriNetSerializer>()
 
-            val petriNet = PetriNet(
-                firePetriNetSerializer.inputs,
-                firePetriNetSerializer.outputs,
-                firePetriNetSerializer.transitions,
-                firePetriNetSerializer.places,
-            )
+                val petriNet = PetriNet(
+                    petriNetSerializer.inputs.map { i -> Input(i.place, i.transition, i.value) },
+                    petriNetSerializer.outputs.map { o -> Output(o.place, o.transition, o.value) },
+                    petriNetSerializer.transitions.map { t -> Transition(t.name) },
+                    petriNetSerializer.places.map { p -> Place(p.name, p.tokens) },
+                )
 
-            val tree = buildReachabilityTree(petriNet.markings, petriNet)
-
-            call.respond(mapOf("tree" to tree.toString()))
+                val tree = buildReachabilityTree(petriNet.markings, petriNet)
+                val treeJSON = parseReachabilityTreeToJSON(tree)
+                call.respondText(treeJSON, ContentType.Application.Json)
+            } catch (e: Throwable) {
+                call.respond(mapOf("errors" to e.message))
+            }
         }
     }
 }
