@@ -108,7 +108,6 @@ class PetriNet(
 
             val rowInInputMatrixOfTransition = relations[rowInInputMatrixOfTransitionIndex]
             matrix = matrix.plus(rowInInputMatrixOfTransition)
-
         }
         return matrix
     }
