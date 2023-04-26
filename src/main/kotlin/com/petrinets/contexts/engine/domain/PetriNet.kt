@@ -106,8 +106,8 @@ class PetriNet(
                 throw Throwable("Transition \"${transition.value.name}\" not found in the petri net.")
             }
 
-            val rowInInputMatrixOfTransition = relations[rowInInputMatrixOfTransitionIndex]
-            matrix = matrix.plus(rowInInputMatrixOfTransition)
+            val relationInInputMatrixOfTransition = relations[rowInInputMatrixOfTransitionIndex]
+            matrix = matrix.plus(relationInInputMatrixOfTransition)
         }
         return matrix
     }
